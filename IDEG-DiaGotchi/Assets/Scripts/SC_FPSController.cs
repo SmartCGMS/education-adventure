@@ -33,12 +33,24 @@ public class SC_FPSController : MonoBehaviour
     {
         characterController = GetComponent<CharacterController>();
 
-        // Lock cursor
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
+        Unfreeze();
     }
 
-    void Update()
+    public void Freeze()
+    {
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+        canMove = false;
+    }
+
+    public void Unfreeze()
+    {
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+        canMove = true;
+    }
+
+    void PerformMovement()
     {
         Vector3 forward = transform.TransformDirection(Vector3.forward);
         Vector3 right = transform.TransformDirection(Vector3.right);
@@ -66,7 +78,10 @@ public class SC_FPSController : MonoBehaviour
             playerCamera.transform.localRotation = Quaternion.Euler(rotationX, 0, 0);
             transform.rotation *= Quaternion.Euler(0, Input.GetAxis("Mouse X") * lookSpeed, 0);
         }
+    }
 
+    void PerformRaycast()
+    {
         RaycastHit hit;
         Ray ray = playerCamera.ScreenPointToRay(new Vector3(Screen.width / 2, Screen.height / 2, 0));
 
@@ -92,8 +107,7 @@ public class SC_FPSController : MonoBehaviour
                 {
                     Transform objectHit = hit.transform;
 
-                    // objectHit.tag
-                    Debug.Log("Ray hit: " + objectHit.name + ", " + hit.distance);
+                    //Debug.Log("Ray hit: " + objectHit.name + ", " + hit.distance);
 
                     var cmp = objectHit.GetComponent<TogglerScript>();
                     if (cmp != null)
@@ -108,5 +122,11 @@ public class SC_FPSController : MonoBehaviour
         }
         else if (InteractPressed)
             InteractPressed = false;
+    }
+
+    void Update()
+    {
+        PerformMovement();
+        PerformRaycast();
     }
 }
