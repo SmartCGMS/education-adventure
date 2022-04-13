@@ -13,6 +13,8 @@ public class PlayerStatsScript : MonoBehaviour
     public GameObject HungerIndicatorPanel;
     public GameObject SleepinessIndicatorPanel;
 
+    private scgms.SCGMS_Game game;
+
     private void UpdateIndicators()
     {
         HungerIndicatorPanel.transform.localScale = new Vector3(HungerValue, 1.0f, 1.0f);
@@ -22,6 +24,8 @@ public class PlayerStatsScript : MonoBehaviour
     void Start()
     {
         UpdateIndicators();
+
+        game = new scgms.SCGMS_Game(1, 1, 5 * 60 * 1000, "log.csv");
     }
 
     void Update()
@@ -35,6 +39,10 @@ public class PlayerStatsScript : MonoBehaviour
             UpdateIndicators();
 
             UpdateTimer = 2.0f;
+
+            game.Step();
+
+            Debug.Log(game.InterstitialGlucose);
         }
     }
 }
