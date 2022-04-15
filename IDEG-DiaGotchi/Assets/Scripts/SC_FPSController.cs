@@ -7,6 +7,8 @@ using UnityEngine.UI;
 
 public class SC_FPSController : MonoBehaviour
 {
+    public static SC_FPSController Current;
+
     public float walkingSpeed = 7.5f;
     public float runningSpeed = 11.5f;
     public float jumpSpeed = 8.0f;
@@ -16,7 +18,7 @@ public class SC_FPSController : MonoBehaviour
     public float lookXLimit = 45.0f;
 
     [SerializeField]
-    private float rayLength = 0.2f;
+    private float rayLength = 5.0f;
 
     CharacterController characterController;
     Vector3 moveDirection = Vector3.zero;
@@ -31,12 +33,24 @@ public class SC_FPSController : MonoBehaviour
 
     public Text RayCastText;
     public Text RayCastInteractText;
+    public Text TalkText;
 
     public GameObject ControllerDisplayPanel;
 
+    private class TalkRecord
+    {
+        public string text;
+        public float durationTimer;
+    }
+
+    private List<TalkRecord> Talks = new List<TalkRecord>();
+
     void Start()
     {
+        Current = this;
+
         characterController = GetComponent<CharacterController>();
+        TalkText.text = "";
 
         Unfreeze();
     }
@@ -53,6 +67,18 @@ public class SC_FPSController : MonoBehaviour
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
         canMove = true;
+    }
+
+    public void Talk(string text, float talkTime = -1.0f)
+    {
+        if (talkTime < 0.5f)
+            talkTime = 2.5f + Mathf.Max(text.Length - 30.0f, 0.0f) * 0.08f; // 0.08 second for every character over 30
+
+        Talks.Add(new TalkRecord
+        {
+            text = text,
+            durationTimer = talkTime
+        });
     }
 
     void PerformMovement()
@@ -90,7 +116,9 @@ public class SC_FPSController : MonoBehaviour
         RaycastHit hit;
         Ray ray = playerCamera.ScreenPointToRay(new Vector3(Screen.width / 2, Screen.height / 2, 0));
 
-        var rayHit = Physics.Raycast(ray, out hit, 5.0f);
+        int layerMask = 0xFF - (1 << 2) - (1 << 6);
+
+        var rayHit = Physics.Raycast(ray, out hit, rayLength, layerMask);
         if (rayHit)
         {
             var namedobj = hit.transform.GetComponent<NamedObjectScript>();
@@ -165,10 +193,45 @@ public class SC_FPSController : MonoBehaviour
             ControllerDisplayPressed = false;
     }
 
+    void PerformTalk()
+    {
+        if (Talks.Count == 0)
+            return;
+
+        TalkRecord cur = Talks[0];
+
+        if (TalkText.text != cur.text)
+            TalkText.text = cur.text;
+
+        cur.durationTimer -= Time.deltaTime;
+        if (cur.durationTimer <= 0.0f)
+        {
+            Talks.RemoveAt(0);
+
+            if (Talks.Count == 0)
+            {
+                TalkText.text = "";
+            }
+            else
+            {
+                cur = Talks[0];
+                TalkText.text = cur.text;
+            }
+        }
+    }
+
     void Update()
     {
         PerformMovement();
         PerformRaycast();
         PerformControl();
+        PerformTalk();
     }
+
+    //////////
+    ///// Persistent state part
+    //////////
+
+    public bool ToiletUseFlag = false;
+
 }

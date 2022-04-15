@@ -16,7 +16,8 @@ public class ToiletScript : MonoBehaviour, InteractiveObject
 
         if (StatsControllerScript.ToiletValue < 0.1f)
         {
-            // TODO: talk ("I don't need to go right now")
+            SC_FPSController.Current.Talk("I don't need to go right now.");
+            SC_FPSController.Current.Talk("Maybe later.");
             return;
         }
 
@@ -26,6 +27,7 @@ public class ToiletScript : MonoBehaviour, InteractiveObject
             StatsControllerScript.UseToilet();
         }, () => {
             ToiletInProgress = false;
+            SC_FPSController.Current.ToiletUseFlag = true;
         });
     }
 }
