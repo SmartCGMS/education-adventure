@@ -5,6 +5,7 @@ using UnityEngine;
 public class NamedObjectScript : MonoBehaviour
 {
     public string ObjectDescription = "Object";
+    public string ObjectInteractDescription = "";
 
     // Start is called before the first frame update
     void Start()

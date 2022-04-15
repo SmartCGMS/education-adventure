@@ -5,42 +5,21 @@ using UnityEngine;
 public class BedScript : MonoBehaviour, InteractiveObject
 {
     private bool SleepInProgress = false;
-    private bool BlackoutIn = false;
-    private float BlackoutTimer = 0.0f;
 
-    public GameObject BlackoutPanel;
+    public BlackoutScript BlackoutPanel;
+    public PlayerStatsScript StatsControllerScript;
 
     public void Interact()
     {
-        if (!SleepInProgress)
-        {
-            BlackoutTimer = 1.0f;
-            SleepInProgress = true;
-            BlackoutIn = true;
-        }
-    }
-
-    public void Update()
-    {
         if (SleepInProgress)
-        {
-            BlackoutTimer -= Time.deltaTime;
+            return;
 
-            if (BlackoutTimer < 0)
-            {
-                if (BlackoutIn)
-                {
-                    BlackoutIn = false;
-                    BlackoutTimer = 1.0f;
-                }
-                else
-                {
-                    SleepInProgress = false;
-                    BlackoutTimer = 0.0f;
-                }
-            }
+        SleepInProgress = true;
 
-            BlackoutPanel.GetComponent<CanvasGroup>().alpha = (BlackoutIn ? (1.0f - BlackoutTimer) : BlackoutTimer);
-        }
+        BlackoutPanel.Blackout(2.0f, () => {
+            StatsControllerScript.SleepFor(120);
+        }, () => {
+            SleepInProgress = false;
+        });
     }
 }

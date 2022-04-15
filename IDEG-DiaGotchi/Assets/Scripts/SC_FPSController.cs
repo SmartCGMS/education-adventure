@@ -26,8 +26,13 @@ public class SC_FPSController : MonoBehaviour
     public bool canMove = true;
 
     private bool InteractPressed = false;
+    private bool ControllerDisplayPressed = false;
+    private bool IsControllerOpened = false;
 
     public Text RayCastText;
+    public Text RayCastInteractText;
+
+    public GameObject ControllerDisplayPanel;
 
     void Start()
     {
@@ -90,12 +95,24 @@ public class SC_FPSController : MonoBehaviour
         {
             var namedobj = hit.transform.GetComponent<NamedObjectScript>();
             if (namedobj != null && namedobj.ObjectDescription.Length > 0)
+            {
                 RayCastText.text = namedobj.ObjectDescription;
+                if (namedobj.ObjectInteractDescription.Length > 0)
+                    RayCastInteractText.text = "[E] " + namedobj.ObjectInteractDescription;
+                else
+                    RayCastInteractText.text = "";
+            }
             else
+            {
                 RayCastText.text = "";
+                RayCastInteractText.text = "";
+            }
         }
         else
+        {
             RayCastText.text = "";
+            RayCastInteractText.text = "";
+        }
 
         if (Input.GetKeyDown(KeyCode.E))
         {
@@ -124,9 +141,34 @@ public class SC_FPSController : MonoBehaviour
             InteractPressed = false;
     }
 
+    void PerformControl()
+    {
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            if (!ControllerDisplayPressed)
+            {
+                ControllerDisplayPressed = true;
+
+                if (IsControllerOpened)
+                {
+                    ControllerDisplayPanel.GetComponent<Animator>().Play("ControllerAnimationDisappear");
+                }
+                else
+                {
+                    ControllerDisplayPanel.GetComponent<Animator>().Play("ControllerAnimation");
+                }
+
+                IsControllerOpened = !IsControllerOpened;
+            }
+        }
+        else if (ControllerDisplayPressed)
+            ControllerDisplayPressed = false;
+    }
+
     void Update()
     {
         PerformMovement();
         PerformRaycast();
+        PerformControl();
     }
 }
