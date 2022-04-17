@@ -52,6 +52,8 @@ public class PlayerStatsScript : MonoBehaviour
     // SmartCGMS wrapper instance
     private scgms.SCGMS_Game game = new scgms.SCGMS_Game(1, 1, (uint)(StepIncrement * 60 * 1000), "log.csv");
 
+    public static PlayerStatsScript Current;
+
     private Color GetColorForScale(float value)
     {
         if (value < 0.5f)
@@ -94,6 +96,8 @@ public class PlayerStatsScript : MonoBehaviour
 
     void Start()
     {
+        Current = this;
+
         UpdateIndicators();
     }
 
@@ -225,5 +229,17 @@ public class PlayerStatsScript : MonoBehaviour
 
         UpdateIndicators();
         UpdateEnvironment();
+    }
+
+    public class MealParam
+    {
+        public float carbs { get; set; }
+        public float hungerDec { get; set; }
+    }
+
+    public void EatMeal(MealParam meal)
+    {
+        game.ScheduleCarbohydratesIntake(meal.carbs, 0.0f);
+        HungerValue = Mathf.Max(0.0f, HungerValue - meal.hungerDec);
     }
 }

@@ -61,8 +61,12 @@ public class DrawControllerGUIScript : MonoBehaviour
         var dispRect = GetComponent<RectTransform>().rect;
 
         if (outTexture == null)
+        {
             outTexture = new Texture2D((int)dispRect.width, (int)dispRect.height);
-        GetComponent<Image>().material.mainTexture = outTexture;
+            GetComponent<Image>().material.mainTexture = outTexture;
+        }
+        // this is a bit tricky, but the texture reference may get cached, replaced, etc.; we must retrieve the actual texture source to modify it properly
+        outTexture = (Texture2D)GetComponent<Image>().material.mainTexture;
 
         // clear
         for (int y = 0; y < outTexture.height; y++)
@@ -129,6 +133,7 @@ public class DrawControllerGUIScript : MonoBehaviour
         }
 
         outTexture.Apply();
+        //((Texture2D)GetComponent<Image>().material.mainTexture).Apply();
     }
 
     void Start()
