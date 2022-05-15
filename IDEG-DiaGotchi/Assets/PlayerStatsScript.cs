@@ -33,6 +33,8 @@ public class PlayerStatsScript : MonoBehaviour
     public Text TimeText;
 
     public TextMeshProUGUI CurrentIGText;
+    public Text PumpTextIG;
+    public Text PumpTextIOB;
 
     public GameObject HungerIndicatorPanel;
     public GameObject SleepinessIndicatorPanel;
@@ -53,6 +55,17 @@ public class PlayerStatsScript : MonoBehaviour
     private scgms.SCGMS_Game game = new scgms.SCGMS_Game(1, 1, (uint)(StepIncrement * 60 * 1000), "log.csv");
 
     public static PlayerStatsScript Current;
+
+    private static readonly int IGHistoryCnt = 4;
+    private List<double> IGHistory = new List<double>();
+
+    public Texture2D TrendLow3;
+    public Texture2D TrendLow2;
+    public Texture2D TrendLow1;
+    public Texture2D TrendSteady;
+    public Texture2D TrendUp1;
+    public Texture2D TrendUp2;
+    public Texture2D TrendUp3;
 
     private Color GetColorForScale(float value)
     {
@@ -92,6 +105,37 @@ public class PlayerStatsScript : MonoBehaviour
         TimeText.text = string.Format("{0}:{1:00}", hour, minute);
 
         CurrentIGText.text = string.Format("{0:0.0}", game.InterstitialGlucose);
+        PumpTextIG.text = string.Format("{0:0.0} mmol/l", game.InterstitialGlucose);
+        PumpTextIOB.text = string.Format("{0:0.0} U", game.InsulinOnBoard);
+
+        Debug.Log("IOB = " + game.InsulinOnBoard);
+
+        // -3, -2, -1, 0, 1, 2, 3
+        int igtrend = 0; // flat
+        if (IGHistory.Count == IGHistoryCnt)
+        {
+            double kTotal = 0;
+
+            for (int i = 0; i < IGHistoryCnt - 1; i++)
+                kTotal += IGHistory[i + 1] - IGHistory[i];
+
+            if (kTotal > 2.5)
+                igtrend = 3;
+            else if (kTotal > 1.7)
+                igtrend = 2;
+            else if (kTotal > 0.8)
+                igtrend = 1;
+            else if (kTotal > -0.8)
+                igtrend = 0;
+            else if (kTotal > -1.7)
+                igtrend = -1;
+            else if (kTotal > -2.5)
+                igtrend = -2;
+            else
+                igtrend = -3;
+        }
+
+        //TODO set trend image in pump according to igtrend value
     }
 
     void Start()
@@ -105,6 +149,10 @@ public class PlayerStatsScript : MonoBehaviour
     {
         game.Step();
         GUIDrawer.PushIG(game.InterstitialGlucose);
+
+        IGHistory.Add(game.InterstitialGlucose);
+        while (IGHistory.Count > IGHistoryCnt)
+            IGHistory.RemoveAt(0);
 
         var beforeMinutes = MinuteOfDay;
 
@@ -241,5 +289,10 @@ public class PlayerStatsScript : MonoBehaviour
     {
         game.ScheduleCarbohydratesIntake(meal.carbs, 0.0f);
         HungerValue = Mathf.Max(0.0f, HungerValue - meal.hungerDec);
+    }
+
+    public void DoseBolus(float val)
+    {
+        game.ScheduleInsulinBolus((double)val, 0.0f);
     }
 }

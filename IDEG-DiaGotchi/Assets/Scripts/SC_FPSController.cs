@@ -31,11 +31,15 @@ public class SC_FPSController : MonoBehaviour
     private bool ControllerDisplayPressed = false;
     private bool IsControllerOpened = false;
 
+    private bool PumpDisplayPressed = false;
+    private bool IsPumpOpened = false;
+
     public Text RayCastText;
     public Text RayCastInteractText;
     public Text TalkText;
 
     public GameObject ControllerDisplayPanel;
+    public GameObject PumpDisplayPanel;
 
     private class TalkRecord
     {
@@ -177,6 +181,13 @@ public class SC_FPSController : MonoBehaviour
             {
                 ControllerDisplayPressed = true;
 
+                if (IsPumpOpened)
+                {
+                    PumpDisplayPanel.GetComponent<Animator>().Play("PumpPanelDisappear");
+                    IsPumpOpened = !IsPumpOpened;
+                    Unfreeze();
+                }
+
                 if (IsControllerOpened)
                 {
                     ControllerDisplayPanel.GetComponent<Animator>().Play("ControllerAnimationDisappear");
@@ -191,6 +202,35 @@ public class SC_FPSController : MonoBehaviour
         }
         else if (ControllerDisplayPressed)
             ControllerDisplayPressed = false;
+
+        if (Input.GetKeyDown(KeyCode.T))
+        {
+            if (!PumpDisplayPressed)
+            {
+                PumpDisplayPressed = true;
+
+                if (IsControllerOpened)
+                {
+                    ControllerDisplayPanel.GetComponent<Animator>().Play("ControllerAnimationDisappear");
+                    IsControllerOpened = !IsControllerOpened;
+                }
+
+                if (IsPumpOpened)
+                {
+                    PumpDisplayPanel.GetComponent<Animator>().Play("PumpPanelDisappear");
+                    Unfreeze();
+                }
+                else
+                {
+                    PumpDisplayPanel.GetComponent<Animator>().Play("PumpPanelAppear");
+                    Freeze();
+                }
+
+                IsPumpOpened = !IsPumpOpened;
+            }
+        }
+        else if (PumpDisplayPressed)
+            PumpDisplayPressed = false;
     }
 
     void PerformTalk()
