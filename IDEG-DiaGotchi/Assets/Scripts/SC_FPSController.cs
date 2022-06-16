@@ -41,10 +41,14 @@ public class SC_FPSController : MonoBehaviour
     public GameObject ControllerDisplayPanel;
     public GameObject PumpDisplayPanel;
 
+
+
     private class TalkRecord
     {
         public string text;
         public float durationTimer;
+        public DataLoader.TalkAction actionBefore = DataLoader.TalkAction.None;
+        public int actionParam = 0;
     }
 
     private List<TalkRecord> Talks = new List<TalkRecord>();
@@ -56,7 +60,13 @@ public class SC_FPSController : MonoBehaviour
         characterController = GetComponent<CharacterController>();
         TalkText.text = "";
 
-        Unfreeze();
+        // will unfreeze after talks
+        Freeze();
+
+        Talk(Strings.Get(7));
+        Talk(Strings.Get(8));
+        Talk(Strings.Get(9), DataLoader.TalkAction.StartNextQuest);
+        Talk(Strings.Get(10), DataLoader.TalkAction.Unfreeze);
     }
 
     public void Freeze()
@@ -73,7 +83,7 @@ public class SC_FPSController : MonoBehaviour
         canMove = true;
     }
 
-    public void Talk(string text, float talkTime = -1.0f)
+    public void Talk(string text, DataLoader.TalkAction action = DataLoader.TalkAction.None, int actionParam = 0, float talkTime = -1.0f)
     {
         if (talkTime < 0.5f)
             talkTime = 2.5f + Mathf.Max(text.Length - 30.0f, 0.0f) * 0.08f; // 0.08 second for every character over 30
@@ -81,7 +91,9 @@ public class SC_FPSController : MonoBehaviour
         Talks.Add(new TalkRecord
         {
             text = text,
-            durationTimer = talkTime
+            actionBefore = action,
+            durationTimer = talkTime,
+            actionParam = actionParam
         });
     }
 
@@ -256,6 +268,22 @@ public class SC_FPSController : MonoBehaviour
             {
                 cur = Talks[0];
                 TalkText.text = cur.text;
+
+                if (cur.actionBefore != DataLoader.TalkAction.None)
+                {
+                    switch (cur.actionBefore)
+                    {
+                        case DataLoader.TalkAction.Freeze:
+                            Freeze();
+                            break;
+                        case DataLoader.TalkAction.Unfreeze:
+                            Unfreeze();
+                            break;
+                        case DataLoader.TalkAction.StartNextQuest:
+                            QuestController.Current.StartNextQuest(); // if no quest currently pushed, the first one will be selected
+                            break;
+                    }
+                }
             }
         }
     }

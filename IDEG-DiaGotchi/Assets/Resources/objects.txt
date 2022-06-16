@@ -1,0 +1,6 @@
+﻿id;name
+1;Backpack
+2;Sink
+3;House door
+4;Snack
+5;Tooth paste

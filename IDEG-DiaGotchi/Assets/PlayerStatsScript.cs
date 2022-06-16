@@ -108,7 +108,7 @@ public class PlayerStatsScript : MonoBehaviour
         PumpTextIG.text = string.Format("{0:0.0} mmol/l", game.InterstitialGlucose);
         PumpTextIOB.text = string.Format("{0:0.0} U", game.InsulinOnBoard);
 
-        Debug.Log("IOB = " + game.InsulinOnBoard);
+        //Debug.Log("IOB = " + game.InsulinOnBoard);
 
         // -3, -2, -1, 0, 1, 2, 3
         int igtrend = 0; // flat

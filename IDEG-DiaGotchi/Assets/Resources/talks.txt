@@ -1,0 +1,3 @@
+id;position;string_id;time;action;action_param
+1;1;13;-1;none;0
+1;2;14;-1;startquest;0
