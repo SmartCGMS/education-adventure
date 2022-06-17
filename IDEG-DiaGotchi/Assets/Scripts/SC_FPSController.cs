@@ -158,6 +158,15 @@ public class SC_FPSController : MonoBehaviour
             RayCastInteractText.text = "";
         }
 
+        if (Input.GetMouseButtonDown(0))
+        {
+            if (Talks.Count > 0)
+            {
+                TalkRecord cur = Talks[0];
+                cur.durationTimer = 0;
+            }
+        }
+
         if (Input.GetKeyDown(KeyCode.E))
         {
             if (!InteractPressed)
@@ -170,14 +179,27 @@ public class SC_FPSController : MonoBehaviour
 
                     //Debug.Log("Ray hit: " + objectHit.name + ", " + hit.distance);
 
-                    var cmp = objectHit.GetComponent<TogglerScript>();
-                    if (cmp != null)
-                        cmp.ToggleState();
+                    var interactiveCond = objectHit.GetComponents<InteractiveObjectCondition>();
+                    bool prevent = false;
+                    foreach (var cond in interactiveCond)
+                    {
+                        if (cond.PreventInteract())
+                        {
+                            prevent = true;
+                            break;
+                        }
+                    }
 
-                    var interactive = objectHit.GetComponent<InteractiveObject>();
-                    if (interactive != null)
-                        interactive.Interact();
+                    if (!prevent)
+                    {
+                        var cmp = objectHit.GetComponent<TogglerScript>();
+                        if (cmp != null)
+                            cmp.ToggleState();
 
+                        var interactive = objectHit.GetComponent<InteractiveObject>();
+                        if (interactive != null)
+                            interactive.Interact();
+                    }
                 }
             }
         }
@@ -294,6 +316,13 @@ public class SC_FPSController : MonoBehaviour
         PerformRaycast();
         PerformControl();
         PerformTalk();
+    }
+
+    public void TeleportTo(float x, float y, float z)
+    {
+        characterController.enabled = false;
+        gameObject.transform.position = new Vector3(x, y, z);
+        characterController.enabled = true;
     }
 
     //////////

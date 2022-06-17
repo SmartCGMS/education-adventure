@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.PlayerLoop;
 using UnityEngine.UI;
 using static UnityEditor.Progress;
 
@@ -83,42 +84,44 @@ public class ObjectivesMgr : MonoBehaviour
             completeMap[obj.questId] = true;
         }
 
-        foreach (var obj in CurrentObjectives)
+        if (update)
         {
-            if (!obj.completed)
-                completeMap[obj.questId] = false;
-        }
-
-        bool allComplete = true;
-        bool allAutostart = true;
-        foreach (var comp in completeMap)
-        {
-            var qt = DataLoader.Current.GetQuestTemplate(comp.Key);
-
-            if (comp.Value)
+            foreach (var obj in CurrentObjectives)
             {
-                if (qt != null && qt.end_talk_id > 0)
+                if (!obj.completed)
+                    completeMap[obj.questId] = false;
+            }
+
+            bool allComplete = true;
+            bool allAutostart = true;
+            foreach (var comp in completeMap)
+            {
+                var qt = DataLoader.Current.GetQuestTemplate(comp.Key);
+
+                if (comp.Value)
                 {
-                    var talk = DataLoader.Current.GetTalk(qt.end_talk_id);
-                    if (talk != null && talk.Count > 0)
+                    if (qt != null && qt.end_talk_id > 0)
                     {
-                        foreach (var t in talk)
-                            SC_FPSController.Current.Talk(Strings.Get(t.string_id), t.action, t.actionParam, t.time);
+                        var talk = DataLoader.Current.GetTalk(qt.end_talk_id);
+                        if (talk != null && talk.Count > 0)
+                        {
+                            foreach (var t in talk)
+                                SC_FPSController.Current.Talk(Strings.Get(t.string_id), t.action, t.actionParam, t.time);
+                        }
                     }
                 }
+                else
+                    allComplete = false;
+
+                if (qt != null && !qt.autostart_next)
+                    allAutostart = false;
             }
-            else
-                allComplete = false;
 
-            if (qt != null && !qt.autostart_next)
-                allAutostart = false;
-        }
+            if (allComplete && allAutostart)
+                QuestController.Current.StartNextQuest();
 
-        if (allComplete && allAutostart)
-            QuestController.Current.StartNextQuest();
-
-        if (update)
             UpdateGUI();
+        }
     }
 
     public void ClearCompletedObjectives(ObjectiveGroups group = ObjectiveGroups.All, int questId = 0)
@@ -126,6 +129,17 @@ public class ObjectivesMgr : MonoBehaviour
         CurrentObjectives.RemoveAll(x => (x.group == group || group == ObjectiveGroups.All) && (x.questId == questId || questId == 0) && x.completed);
 
         UpdateGUI();
+    }
+
+    public bool HasActiveQuest(int questId)
+    {
+        foreach (var obj in CurrentObjectives)
+        {
+            if (obj.questId == questId)
+                return true;
+        }
+
+        return false;
     }
 
     public void UpdateGUI()

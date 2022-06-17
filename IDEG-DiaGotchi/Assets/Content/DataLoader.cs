@@ -58,6 +58,12 @@ public class DataLoader
         public int actionParam;
     }
 
+    public class AreaTriggerTemplate
+    {
+        public int id;
+        public int name_id;
+    }
+
     public enum TalkAction
     {
         None,
@@ -70,6 +76,7 @@ public class DataLoader
     private Dictionary<int, ObjectTemplate> _Objects = new Dictionary<int, ObjectTemplate>();
     private Dictionary<int, QuestTemplate> _Quests = new Dictionary<int, QuestTemplate>();
     private Dictionary<int, List<TalkTemplate>> _Talks = new Dictionary<int, List<TalkTemplate>>();
+    private Dictionary<int, AreaTriggerTemplate> _AreaTriggers = new Dictionary<int, AreaTriggerTemplate>();
 
     public int MaxQuestId { get; private set; } = 0;
 
@@ -79,11 +86,12 @@ public class DataLoader
         LoadQuests();
         LoadObjectives();
         LoadTalks();
+        LoadAreaTriggers();
     }
 
     private void LoadObjects()
     {
-        var res = CSVLoader.ReadResourceCSV("objects");
+        var res = CSVLoader.ReadResourceCSV("objects.en");
 
         foreach (var r in res)
         {
@@ -129,6 +137,8 @@ public class DataLoader
                 otype = Objectives.Collect;
             else if (typeName == "use")
                 otype = Objectives.Use;
+            else if (typeName == "areatrigger")
+                otype = Objectives.AreaTrigger;
 
             string grpName = r["group"];
 
@@ -154,9 +164,6 @@ public class DataLoader
 
     private void LoadTalks()
     {
-        //id;position;string_id;time;action;action_param
-        //1;1;13;-1;none;0
-
         var res = CSVLoader.ReadResourceCSV("talks");
 
         foreach (var r in res)
@@ -187,6 +194,19 @@ public class DataLoader
             talks.Value.Sort((TalkTemplate a, TalkTemplate b) => { return a.position.CompareTo(b.position); });
     }
 
+    private void LoadAreaTriggers()
+    {
+        var res = CSVLoader.ReadResourceCSV("areatriggers");
+
+        foreach (var r in res)
+        {
+            int id = Int32.Parse(r["id"]);
+            int name = Int32.Parse(r["name_id"]);
+
+            _AreaTriggers.Add(id, new AreaTriggerTemplate { id = id, name_id = name });
+        }
+    }
+
     public ObjectTemplate GetObjectTemplate(int id)
     {
         if (_Objects.ContainsKey(id))
@@ -205,6 +225,13 @@ public class DataLoader
     {
         if (_Talks.ContainsKey(id))
             return _Talks[id];
+        return null;
+    }
+
+    public AreaTriggerTemplate GetAreaTriggerTemplate(int id)
+    {
+        if (_AreaTriggers.ContainsKey(id))
+            return _AreaTriggers[id];
         return null;
     }
 }

@@ -13,3 +13,6 @@
 12;"Go to school"
 13;"Good job!"
 14;"Now I should leave, school starts soon!"
+15;"Bathroom wash hands trigger"
+16;"House door trigger"
+17;"I am not ready yet, I can't leave!"

@@ -1,0 +1,27 @@
+﻿id;name
+1;Backpack
+2;Sink
+3;House door
+4;Snack
+5;Tooth paste
+6;Laptop
+7;Bed
+8;Bedside table
+9;Closet
+10;Light switch
+11;Room door
+12;Fridge
+13;Toaster
+14;Corridor door
+15;Washing machine
+16;Dirty clothes basket
+17;Sink
+18;Toilet
+19;Bathtub
+20;Bathroom door
+21;Living room door
+22;Parents' bedroom door
+23;Piano
+24;Sofa
+25;Television
+26;Outside door

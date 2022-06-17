@@ -10,4 +10,5 @@ public enum Objectives
 
     Collect,
     Use,
+    AreaTrigger,
 }

@@ -2,4 +2,4 @@ id;quest_id;type;name_id;object_id;group
 1;1;collect;1;1;home
 2;1;use;4;5;home
 3;1;collect;5;4;home
-4;2;use;12;3;home
+4;2;areatrigger;12;2;home
