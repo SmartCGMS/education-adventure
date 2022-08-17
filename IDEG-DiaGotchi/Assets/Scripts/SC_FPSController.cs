@@ -320,8 +320,26 @@ public class SC_FPSController : MonoBehaviour
 
     public void TeleportTo(float x, float y, float z)
     {
+        TeleportTo(new Vector3(x, y, z));
+    }
+
+    public void TeleportTo(Vector3 targetPos)
+    {
         characterController.enabled = false;
-        gameObject.transform.position = new Vector3(x, y, z);
+        gameObject.transform.position = targetPos;
+        characterController.enabled = true;
+    }
+
+    public void TeleportTo(float x, float y, float z, float rotX, float rotY, float rotZ, float rotW)
+    {
+        TeleportTo(new Vector3(x, y, z), new Quaternion(rotX, rotY, rotZ, rotW));
+    }
+
+    public void TeleportTo(Vector3 targetPos, Quaternion targetRot)
+    {
+        characterController.enabled = false;
+        gameObject.transform.position = targetPos;
+        gameObject.transform.rotation = targetRot;
         characterController.enabled = true;
     }
 
