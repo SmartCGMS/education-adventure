@@ -3,3 +3,9 @@ id;quest_id;type;name_id;object_id;group
 2;1;use;4;5;home
 3;1;collect;5;4;home
 4;2;areatrigger;12;2;home
+5;3;use;23;27;school
+6;3;misc;19;-1;school
+7;3;misc;20;-2;school
+8;4;misc;90;-1;school
+9;4;misc;91;-2;school
+10;4;misc;92;-3;school

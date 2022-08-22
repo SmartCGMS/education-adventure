@@ -1,0 +1,6 @@
+id;position;question_string_id;answer0_correct_string_id;answer1_string_id;answer2_string_id;answer3_string_id
+1;1;62;63;64;65;-1
+1;2;66;67;68;69;70
+1;3;71;72;73;74;-1
+1;4;75;76;77;78;-1
+1;5;79;80;81;82;83

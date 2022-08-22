@@ -25,3 +25,4 @@
 24;Sofa
 25;Television
 26;Outside door
+27;My seat

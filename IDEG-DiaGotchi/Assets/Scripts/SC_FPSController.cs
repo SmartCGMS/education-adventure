@@ -26,6 +26,8 @@ public class SC_FPSController : MonoBehaviour
 
     [HideInInspector]
     public bool canMove = true;
+    [HideInInspector]
+    public bool canRotate = true;
 
     private bool InteractPressed = false;
     private bool ControllerDisplayPressed = false;
@@ -40,7 +42,7 @@ public class SC_FPSController : MonoBehaviour
 
     public GameObject ControllerDisplayPanel;
     public GameObject PumpDisplayPanel;
-
+    public GameObject MainCameraObject;
 
 
     private class TalkRecord
@@ -67,12 +69,20 @@ public class SC_FPSController : MonoBehaviour
         Talk(Strings.Get(8));
         Talk(Strings.Get(9), DataLoader.TalkAction.StartNextQuest);
         Talk(Strings.Get(10), DataLoader.TalkAction.Unfreeze);
+
+        MainCameraObject.GetComponent<Animator>().enabled = false;
     }
 
-    public void Freeze()
+    public void Freeze(bool allowRotation = false)
     {
-        Cursor.lockState = CursorLockMode.None;
-        Cursor.visible = true;
+        if (allowRotation)
+            canRotate = true;
+        else
+        {
+            canRotate = false;
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
+        }
         canMove = false;
     }
 
@@ -81,6 +91,7 @@ public class SC_FPSController : MonoBehaviour
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
         canMove = true;
+        canRotate = true;
     }
 
     public void Talk(string text, DataLoader.TalkAction action = DataLoader.TalkAction.None, int actionParam = 0, float talkTime = -1.0f)
@@ -95,6 +106,16 @@ public class SC_FPSController : MonoBehaviour
             durationTimer = talkTime,
             actionParam = actionParam
         });
+    }
+
+    public void TalkAll(int talkId)
+    {
+        var talk = DataLoader.Current.GetTalk(talkId);
+        if (talk != null && talk.Count > 0)
+        {
+            foreach (var t in talk)
+                SC_FPSController.Current.Talk(Strings.Get(t.string_id), t.action, t.actionParam, t.time);
+        }
     }
 
     void PerformMovement()
@@ -118,7 +139,7 @@ public class SC_FPSController : MonoBehaviour
 
         characterController.Move(moveDirection * Time.deltaTime);
 
-        if (canMove)
+        if (canRotate)
         {
             rotationX += -Input.GetAxis("Mouse Y") * lookSpeed;
             rotationX = Mathf.Clamp(rotationX, -lookXLimit, lookXLimit);
@@ -304,6 +325,9 @@ public class SC_FPSController : MonoBehaviour
                         case DataLoader.TalkAction.StartNextQuest:
                             QuestController.Current.StartNextQuest(); // if no quest currently pushed, the first one will be selected
                             break;
+                        case DataLoader.TalkAction.ScriptedAction:
+                            PerformScriptedAction(cur.actionParam);
+                            break;
                     }
                 }
             }
@@ -349,4 +373,77 @@ public class SC_FPSController : MonoBehaviour
 
     public bool ToiletUseFlag = false;
 
+    //////////
+    ///// Scripted talk actions part
+    ///// TODO: move this to separate file?
+    //////////
+
+    private Dictionary<int, List<IScriptedActionListener>> _ScriptedActionListeners = new Dictionary<int, List<IScriptedActionListener>>();
+
+    public void SubscribeForScriptedAction(IScriptedActionListener listener, int actionId)
+    {
+        if (!_ScriptedActionListeners.ContainsKey(actionId))
+        {
+            _ScriptedActionListeners[actionId] = new List<IScriptedActionListener> { listener };
+            return;
+        }
+
+        if (_ScriptedActionListeners[actionId].Contains(listener))
+            return;
+
+        _ScriptedActionListeners[actionId].Add(listener);
+    }
+
+    public void SubscribeForScriptedActions(IScriptedActionListener listener, IEnumerable<int> actionIds)
+    {
+        foreach (int actionId in actionIds)
+            SubscribeForScriptedAction(listener, actionId);
+    }
+
+    public void UnsubscribeFromScriptedAction(IScriptedActionListener listener, int actionId)
+    {
+        if (!_ScriptedActionListeners[actionId].Contains(listener))
+            return;
+
+        _ScriptedActionListeners[actionId].Remove(listener);
+
+        // remove empty listener lists
+        if (_ScriptedActionListeners[actionId].Count == 0)
+            _ScriptedActionListeners.Remove(actionId);
+    }
+
+    public void UnsubscribeFromAllScriptedActions(IScriptedActionListener listener)
+    {
+        foreach (var pair in _ScriptedActionListeners)
+            UnsubscribeFromScriptedAction(listener, pair.Key);
+    }
+
+    public void BroadcastScriptedAction(int actionId)
+    {
+        if (_ScriptedActionListeners.ContainsKey(actionId))
+        {
+            foreach (var listener in _ScriptedActionListeners[actionId])
+                listener.ScriptedActionPerformed(actionId);
+        }
+    }
+
+    public void PerformScriptedAction(int actionId)
+    {
+        // this object could be considered an "implicit listener of all actions"
+        // others need to be subscribed to be later notified
+        BroadcastScriptedAction(actionId);
+
+        switch (actionId)
+        {
+            case 1: // teacher finishes talk about diabetes - signal quest objective
+                ObjectivesMgr.Current.SignalObjective(Objectives.Misc, -1);
+                Freeze(false);
+                break;
+            case 2: // exam 1 finishes - signal quest objective
+                ObjectivesMgr.Current.SignalObjective(Objectives.Misc, -2);
+                Unfreeze();
+                Freeze(true);
+                break;
+        }
+    }
 }

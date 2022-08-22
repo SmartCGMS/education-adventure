@@ -64,19 +64,38 @@ public class DataLoader
         public int name_id;
     }
 
+    public class ExamTemplate
+    {
+        public int id;
+        public int name_id;
+        public int finishedScriptedActionId;
+
+        public List<ExamQuestionTemplate> questions = new List<ExamQuestionTemplate>();
+    }
+
+    public class ExamQuestionTemplate
+    {
+        public int exam_id;
+        public int position;
+        public int question_string_id;
+        public List<int> answer_string_ids = new List<int>(); // index 0 is always the right answer
+    }
+
     public enum TalkAction
     {
         None,
 
         Freeze,
         Unfreeze,
-        StartNextQuest
+        StartNextQuest,
+        ScriptedAction,
     }
 
     private Dictionary<int, ObjectTemplate> _Objects = new Dictionary<int, ObjectTemplate>();
     private Dictionary<int, QuestTemplate> _Quests = new Dictionary<int, QuestTemplate>();
     private Dictionary<int, List<TalkTemplate>> _Talks = new Dictionary<int, List<TalkTemplate>>();
     private Dictionary<int, AreaTriggerTemplate> _AreaTriggers = new Dictionary<int, AreaTriggerTemplate>();
+    private Dictionary<int, ExamTemplate> _Exams = new Dictionary<int, ExamTemplate>();
 
     public int MaxQuestId { get; private set; } = 0;
 
@@ -87,6 +106,7 @@ public class DataLoader
         LoadObjectives();
         LoadTalks();
         LoadAreaTriggers();
+        LoadExams();
     }
 
     private void LoadObjects()
@@ -139,6 +159,8 @@ public class DataLoader
                 otype = Objectives.Use;
             else if (typeName == "areatrigger")
                 otype = Objectives.AreaTrigger;
+            else if (typeName == "misc")
+                otype = Objectives.Misc;
 
             string grpName = r["group"];
 
@@ -181,6 +203,8 @@ public class DataLoader
                 act = TalkAction.Unfreeze;
             else if (actionStr == "startquest")
                 act = TalkAction.StartNextQuest;
+            else if (actionStr == "scripted")
+                act = TalkAction.ScriptedAction;
 
             int apar = Int32.Parse(r["action_param"]);
 
@@ -207,6 +231,53 @@ public class DataLoader
         }
     }
 
+    private void LoadExams()
+    {
+        var res = CSVLoader.ReadResourceCSV("exams");
+
+        foreach (var r in res)
+        {
+            int id = Int32.Parse(r["id"]);
+            int name = Int32.Parse(r["name_id"]);
+            int fid = Int32.Parse(r["finished_scripted_action_id"]);
+
+            _Exams.Add(id, new ExamTemplate { id = id, name_id = name, finishedScriptedActionId = fid });
+        }
+
+        var rq = CSVLoader.ReadResourceCSV("examquestions");
+
+        foreach (var r in rq)
+        {
+            var id = Int32.Parse(r["id"]);
+
+            if (!_Exams.ContainsKey(id))
+                continue;
+
+            int pos = Int32.Parse(r["position"]);
+            int q_id = Int32.Parse(r["question_string_id"]);
+            int cor_id = Int32.Parse(r["answer0_correct_string_id"]);
+
+            ExamQuestionTemplate qtpl = new ExamQuestionTemplate() { exam_id = id, position = pos, question_string_id = q_id };
+
+            qtpl.answer_string_ids.Add(cor_id);
+
+            for (int i = 1; i <= 3; i++)
+            {
+                int ans_id = Int32.Parse(r["answer"+i+"_string_id"]);
+                if (ans_id > 0)
+                    qtpl.answer_string_ids.Add(ans_id);
+            }
+
+            _Exams[id].questions.Add(qtpl);
+        }
+
+        foreach (var exam in _Exams)
+            exam.Value.questions.Sort((ExamQuestionTemplate a, ExamQuestionTemplate b) => { return a.position.CompareTo(b.position); });
+    }
+
+
+
+
     public ObjectTemplate GetObjectTemplate(int id)
     {
         if (_Objects.ContainsKey(id))
@@ -232,6 +303,13 @@ public class DataLoader
     {
         if (_AreaTriggers.ContainsKey(id))
             return _AreaTriggers[id];
+        return null;
+    }
+
+    public ExamTemplate GetExam(int id)
+    {
+        if (_Exams.ContainsKey(id))
+            return _Exams[id];
         return null;
     }
 }

@@ -48,7 +48,7 @@ public class PlayerStatsScript : MonoBehaviour
 
     public GameObject sceneLight;
 
-    private uint DayOfWeek = 6; // sunday
+    private uint DayOfWeek = 0; // monday
     private uint MinuteOfDay = 6 * 60 + 0; // 6:00
 
     // SmartCGMS wrapper instance
@@ -102,7 +102,23 @@ public class PlayerStatsScript : MonoBehaviour
         uint hour = MinuteOfDay / 60;
         uint minute = MinuteOfDay % 60;
 
-        TimeText.text = string.Format("{0}:{1:00}", hour, minute);
+        string dayPhase = "day";
+        if (hour >= 22 || hour <= 5)
+            dayPhase = "night";
+        else if (hour <= 8)
+            dayPhase = "morning";
+        else if (hour <= 11)
+            dayPhase = "forenoon";
+        else if (hour == 12)
+            dayPhase = "noon";
+        else if (hour <= 16)
+            dayPhase = "afternoon";
+        else if (hour <= 18)
+            dayPhase = "late afternoon";
+        else
+            dayPhase = "evening";
+
+        TimeText.text = dayPhase;//string.Format("{0}:{1:00}", hour, minute);
 
         CurrentIGText.text = string.Format("{0:0.0}", game.InterstitialGlucose);
         PumpTextIG.text = string.Format("{0:0.0} mmol/l", game.InterstitialGlucose);
@@ -156,12 +172,15 @@ public class PlayerStatsScript : MonoBehaviour
 
         var beforeMinutes = MinuteOfDay;
 
+        // NOTE: disabled continuous change of time
+        /*
         MinuteOfDay += (uint)(StepIncrement);
         if (MinuteOfDay > 1440) // 24h
         {
             MinuteOfDay = 0;
             DayOfWeek = (DayOfWeek + 1) % 7;
         }
+        */
 
         if (beforeMinutes < 360 && MinuteOfDay >= 360) // 6:00
             MainCamera.GetComponent<Skybox>().material = DaySkybox;
@@ -175,11 +194,16 @@ public class PlayerStatsScript : MonoBehaviour
 
     void UpdateEnvironment()
     {
+        // NOTE: disabled continuous change of time
+        /*
         float interpolant = ((UpdateTimerRepeat - UpdateTimer) / UpdateTimerRepeat) * StepIncrement;
         // this causes the "sun" to be directly above the player on 12:00 and directly under at 0:00
         float xrot = -90.0f + (((float)MinuteOfDay + interpolant) / 1440.0f) * 360.0f;
+        */
+        float xrot = -90.0f + (((float)MinuteOfDay) / 1440.0f) * 360.0f;
 
         sceneLight.transform.localEulerAngles = new Vector3(xrot, -130.0f, 0.0f);
+        
 
         var light = sceneLight.GetComponent<Light>();
         if (light != null)
@@ -246,6 +270,12 @@ public class PlayerStatsScript : MonoBehaviour
         }
 
         UpdateEnvironment();
+    }
+
+    public void SetTime(uint hour, uint minute)
+    {
+        MinuteOfDay = hour * 60 + minute;
+        Invoke("UpdateIndicators", 0);
     }
 
     public void SleepFor(int minutes)
