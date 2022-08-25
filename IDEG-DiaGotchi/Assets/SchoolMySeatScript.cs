@@ -6,12 +6,14 @@ public class SchoolMySeatScript : UsableObject, IScriptedActionListener
 {
     public GameObject TeacherObject = null;
     public GameObject StudentsObjectParent = null;
+    public GameObject TeleportFromPlaceTarget = null;
 
     public override void Interact()
     {
-        SC_FPSController.Current.SubscribeForScriptedAction(this, 1);
-        SC_FPSController.Current.SubscribeForScriptedAction(this, 2);
-        SC_FPSController.Current.SubscribeForScriptedAction(this, 10009);
+        SC_FPSController.Current.SubscribeForScriptedAction(this, 1);       // talking done, exam started
+        SC_FPSController.Current.SubscribeForScriptedAction(this, 2);       // exam finished
+        SC_FPSController.Current.SubscribeForScriptedAction(this, 10009);   // finish class (first exam)
+
         gameObject.GetComponent<MeshCollider>().enabled = false; // this also disables interaction!
 
         base.Interact();
@@ -19,23 +21,16 @@ public class SchoolMySeatScript : UsableObject, IScriptedActionListener
         SC_FPSController.Current.TeleportTo(gameObject.transform.position);
         SC_FPSController.Current.Freeze(true);
 
-        if (TeacherObject != null)
-        {
-            //TeacherObject.GetComponent<Animator>().Play("Armature|Teaching1");
-            TeacherObject.GetComponent<Animator>().SetBool("IsClassInProgress", true);
-            SC_FPSController.Current.TalkAll(3);
-        }
+        TeacherObject?.GetComponent<Animator>().SetBool("IsClassInProgress", true);
+        SC_FPSController.Current.TalkAll(3);
     }
 
     public void ScriptedActionPerformed(int actionId)
     {
+        // talking done, exam started
         if (actionId == 1)
         {
-            if (TeacherObject != null)
-            {
-                //TeacherObject.GetComponent<Animator>().Play("Armature|CheckingClassLoop");
-                TeacherObject.GetComponent<Animator>().SetBool("IsCheckingClass", true);
-            }
+            TeacherObject?.GetComponent<Animator>().SetBool("IsCheckingClass", true);
 
             if (StudentsObjectParent != null)
             {
@@ -50,9 +45,10 @@ public class SchoolMySeatScript : UsableObject, IScriptedActionListener
                 }
             }
         }
+        // exam finished
         else if (actionId == 2)
         {
-            TeacherObject.GetComponent<Animator>().SetBool("IsCheckingClass", false);
+            TeacherObject?.GetComponent<Animator>().SetBool("IsCheckingClass", false);
 
             if (StudentsObjectParent != null)
             {
@@ -69,9 +65,14 @@ public class SchoolMySeatScript : UsableObject, IScriptedActionListener
 
             SC_FPSController.Current.TalkAll(4);
         }
+        // finish class (first exam)
         else if (actionId == 10009)
         {
             TeacherObject.GetComponent<Animator>().SetBool("IsClassInProgress", false);
+            SC_FPSController.Current.Unfreeze();
+
+            if (TeleportFromPlaceTarget != null)
+                SC_FPSController.Current.TeleportTo(TeleportFromPlaceTarget.transform.position, TeleportFromPlaceTarget.transform.rotation);
         }
     }
 }
