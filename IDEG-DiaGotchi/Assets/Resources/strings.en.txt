@@ -89,9 +89,10 @@
 88;The class is over for now, see you after lunch!
 89;Lunch time!
 90;Pick a lunch
-91;Take bolus insulin
+91;Go to cafeteria
 92;Eat lunch
 93;Teacher: Come on now, find your seat, the lecture starts soon!
 94;Hey! How are you?
 95;I wonder what we will learn today!
 96;The teacher seems to be in a good mood today!
+97;Now is not a good time to leave classroom!

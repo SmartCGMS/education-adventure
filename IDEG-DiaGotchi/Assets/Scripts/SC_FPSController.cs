@@ -44,6 +44,10 @@ public class SC_FPSController : MonoBehaviour
     public GameObject PumpDisplayPanel;
     public GameObject MainCameraObject;
 
+    public bool PerformFakeStart = true;
+    public int FakeStartQuestId = 4;
+    public GameObject FakeStartGameObject = null;
+
 
     private class TalkRecord
     {
@@ -62,15 +66,26 @@ public class SC_FPSController : MonoBehaviour
         characterController = GetComponent<CharacterController>();
         TalkText.text = "";
 
-        // will unfreeze after talks
-        Freeze();
+        if (PerformFakeStart)
+        {
+            QuestController.Current.FakeStart(FakeStartQuestId);
+            if (FakeStartGameObject != null)
+                TeleportTo(FakeStartGameObject.transform.position, FakeStartGameObject.transform.rotation);
 
-        Talk(Strings.Get(7));
-        Talk(Strings.Get(8));
-        Talk(Strings.Get(9), DataLoader.TalkAction.StartNextQuest);
-        Talk(Strings.Get(10), DataLoader.TalkAction.Unfreeze);
+            Unfreeze();
+        }
+        else
+        {
+            // will unfreeze after talks
+            Freeze();
 
-        MainCameraObject.GetComponent<Animator>().enabled = false;
+            Talk(Strings.Get(7));
+            Talk(Strings.Get(8));
+            Talk(Strings.Get(9), DataLoader.TalkAction.StartNextQuest);
+            Talk(Strings.Get(10), DataLoader.TalkAction.Unfreeze);
+
+            MainCameraObject.GetComponent<Animator>().enabled = false;
+        }
     }
 
     public void Freeze(bool allowRotation = false)
@@ -365,6 +380,32 @@ public class SC_FPSController : MonoBehaviour
         gameObject.transform.position = targetPos;
         gameObject.transform.rotation = targetRot;
         characterController.enabled = true;
+    }
+
+    private GameObject HeldObject = null;
+
+    public void CreateHeldObject(GameObject objTemplate, Vector3 offset, Quaternion rotation, Vector3 scale)
+    {
+        if (HeldObject != null)
+            ClearHeldObjects();
+
+        GameObject obj = Instantiate(objTemplate, gameObject.transform) as GameObject;
+
+        obj.transform.parent = gameObject.transform;
+
+        obj.transform.localPosition = offset;
+        obj.transform.localRotation = rotation;
+        obj.transform.localScale = scale;
+    }
+
+    public void ClearHeldObjects()
+    {
+        Destroy(HeldObject);
+    }
+
+    public bool IsHoldingObject()
+    {
+        return (HeldObject != null);
     }
 
     //////////

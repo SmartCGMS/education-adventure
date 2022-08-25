@@ -73,6 +73,19 @@ public class SchoolMySeatScript : UsableObject, IScriptedActionListener
 
             if (TeleportFromPlaceTarget != null)
                 SC_FPSController.Current.TeleportTo(TeleportFromPlaceTarget.transform.position, TeleportFromPlaceTarget.transform.rotation);
+
+            if (StudentsObjectParent != null)
+            {
+                foreach (Transform tr in StudentsObjectParent.transform)
+                {
+                    var animator = tr.GetComponent<Animator>();
+                    if (animator != null)
+                    {
+                        animator.SetInteger("SlackingOffSeed", Random.Range(1,3+1 /*exclusive*/));
+                        animator.SetFloat("AnimSpeedMultiplier", Random.Range(0.5f, 1.0f));
+                    }
+                }
+            }
         }
     }
 }

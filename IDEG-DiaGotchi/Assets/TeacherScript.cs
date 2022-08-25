@@ -8,6 +8,9 @@ public class TeacherScript : MonoBehaviour, InteractiveObject
 
     public void Interact()
     {
+        if (LookingAtPlayer)
+            return;
+
         if (ObjectivesMgr.Current.HasActiveQuest(3))
         {
             LookingAtPlayer = true;

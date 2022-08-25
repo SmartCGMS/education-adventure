@@ -16,7 +16,11 @@ public class OutsideDoorTrigger : MonoBehaviour, AreaTrigger
 
             BlackoutPanel.Blackout(3.0f, () => {
                 if (TeleportTarget != null)
+                {
                     SC_FPSController.Current.TeleportTo(TeleportTarget.transform.position, TeleportTarget.transform.rotation);
+                    if (ObjectivesMgr.Current.HasActiveQuest(2))
+                        PlayerStatsScript.Current.SetTime(10, 15);
+                }
             }, () => {
                 SC_FPSController.Current.Unfreeze();
             });

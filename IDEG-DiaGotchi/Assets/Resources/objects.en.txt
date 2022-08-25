@@ -27,3 +27,7 @@
 26;Outside door
 27;My seat
 28;Ms. Doubtfire
+29;Cafeteria staff
+30;Tray
+31;Classroom door
+32;Tray line

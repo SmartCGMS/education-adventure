@@ -6,6 +6,6 @@ id;quest_id;type;name_id;object_id;group
 5;3;use;23;27;school
 6;3;misc;19;-1;school
 7;3;misc;20;-2;school
-8;4;misc;90;-1;school
-9;4;misc;91;-2;school
+8;4;use;91;31;school
+9;4;misc;90;-2;school
 10;4;misc;92;-3;school

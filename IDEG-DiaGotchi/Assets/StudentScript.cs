@@ -8,6 +8,9 @@ public class StudentScript : MonoBehaviour, InteractiveObject
 
     public void Interact()
     {
+        if (LookingAtPlayer)
+            return;
+
         LookingAtPlayer = true;
         Invoke("StopLooking", 2.0f);
 

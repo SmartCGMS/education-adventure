@@ -278,6 +278,16 @@ public class PlayerStatsScript : MonoBehaviour
         Invoke("UpdateIndicators", 0);
     }
 
+    public uint GetCurrentHour()
+    {
+        return MinuteOfDay / 60;
+    }
+
+    public uint GetCurrentMinute()
+    {
+        return MinuteOfDay % 60;
+    }
+
     public void SleepFor(int minutes)
     {
         int stepIncrement = (int)StepIncrement;
