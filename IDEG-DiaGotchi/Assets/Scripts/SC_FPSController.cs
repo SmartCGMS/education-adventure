@@ -19,7 +19,7 @@ public class SC_FPSController : MonoBehaviour
     public float lookXLimit = 45.0f;
 
     [SerializeField]
-    private float rayLength = 5.0f;
+    private float rayLength = 2.0f; // NOTE: this should be further adjusted for objects with larger interact distance
 
     CharacterController characterController;
     Vector3 moveDirection = Vector3.zero;
@@ -166,30 +166,38 @@ public class SC_FPSController : MonoBehaviour
 
     void PerformRaycast()
     {
-        RaycastHit hit;
         Ray ray = playerCamera.ScreenPointToRay(new Vector3(Screen.width / 2, Screen.height / 2, 0));
 
         int layerMask = 0xFF - (1 << 2) - (1 << 6);
 
-        var rayHit = Physics.Raycast(ray, out hit, rayLength, layerMask);
-        if (rayHit)
+        RaycastHit[] hits;
+        hits = Physics.RaycastAll(ray, rayLength, layerMask);
+
+        int realHitIndex = 0; // if something gets hit, but nothing is registered, we "hit" the first object for interaction
+        bool nameAssigned = false;
+
+        if (hits.Length > 0)
         {
-            var namedobj = hit.transform.GetComponent<NamedObjectScript>();
-            if (namedobj != null && namedobj.enabled && namedobj.ObjectDescription.Length > 0)
+            for (int i = 0; i < hits.Length; i++)
             {
-                RayCastText.text = namedobj.ObjectDescription;
-                if (namedobj.ObjectInteractDescription.Length > 0)
-                    RayCastInteractText.text = "[E] " + namedobj.ObjectInteractDescription;
-                else
-                    RayCastInteractText.text = "";
-            }
-            else
-            {
-                RayCastText.text = "";
-                RayCastInteractText.text = "";
+                RaycastHit hit = hits[i];
+                var namedobj = hit.transform.GetComponent<NamedObjectScript>();
+                if (namedobj != null && namedobj.enabled && namedobj.ObjectDescription.Length > 0)
+                {
+                    realHitIndex = i;
+                    nameAssigned = true;
+                    RayCastText.text = namedobj.ObjectDescription;
+                    if (namedobj.ObjectInteractDescription.Length > 0)
+                        RayCastInteractText.text = "[E] " + namedobj.ObjectInteractDescription;
+                    else
+                        RayCastInteractText.text = "";
+
+                    break;
+                }
             }
         }
-        else
+
+        if (!nameAssigned)
         {
             RayCastText.text = "";
             RayCastInteractText.text = "";
@@ -210,11 +218,11 @@ public class SC_FPSController : MonoBehaviour
             {
                 InteractPressed = true;
 
-                if (rayHit)
+                if (hits.Length > 0)
                 {
-                    Transform objectHit = hit.transform;
+                    RaycastHit hit = hits[realHitIndex];
 
-                    //Debug.Log("Ray hit: " + objectHit.name + ", " + hit.distance);
+                    Transform objectHit = hit.transform;
 
                     var interactiveCond = objectHit.GetComponents<InteractiveObjectCondition>();
                     bool prevent = false;
