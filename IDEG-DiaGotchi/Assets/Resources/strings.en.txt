@@ -96,3 +96,8 @@
 95;I wonder what we will learn today!
 96;The teacher seems to be in a good mood today!
 97;Now is not a good time to leave classroom!
+98;Beef on mushrooms, rice
+99;Potato gnocchi, poppy seeds
+100;Vegetable risotto
+101;Rissole with potatoes
+102;First, I need to pick up a tray!

@@ -81,6 +81,23 @@ public class DataLoader
         public List<int> answer_string_ids = new List<int>(); // index 0 is always the right answer
     }
 
+    public class FoodTemplate
+    {
+        public int id;
+        public string alias;
+        public int name_id;
+        public FoodCategory category;
+        public int base_amount;
+        public int portion_amount;
+        public string unit;
+        public int kilocalories;
+        public int carbs;
+        public int sugar;
+        public int fat;
+        public int proteins;
+        public int fibre;
+    }
+
     public enum TalkAction
     {
         None,
@@ -91,11 +108,24 @@ public class DataLoader
         ScriptedAction,
     }
 
+    public enum FoodCategory
+    {
+        None,
+
+        MainCourse,
+        Soup,
+        Desert,
+        Drink,
+
+        All
+    }
+
     private Dictionary<int, ObjectTemplate> _Objects = new Dictionary<int, ObjectTemplate>();
     private Dictionary<int, QuestTemplate> _Quests = new Dictionary<int, QuestTemplate>();
     private Dictionary<int, List<TalkTemplate>> _Talks = new Dictionary<int, List<TalkTemplate>>();
     private Dictionary<int, AreaTriggerTemplate> _AreaTriggers = new Dictionary<int, AreaTriggerTemplate>();
     private Dictionary<int, ExamTemplate> _Exams = new Dictionary<int, ExamTemplate>();
+    private Dictionary<int, FoodTemplate> _Food = new Dictionary<int, FoodTemplate>();
 
     public int MaxQuestId { get; private set; } = 0;
 
@@ -107,6 +137,7 @@ public class DataLoader
         LoadTalks();
         LoadAreaTriggers();
         LoadExams();
+        LoadFood();
     }
 
     private void LoadObjects()
@@ -275,6 +306,52 @@ public class DataLoader
             exam.Value.questions.Sort((ExamQuestionTemplate a, ExamQuestionTemplate b) => { return a.position.CompareTo(b.position); });
     }
 
+    private void LoadFood()
+    {
+        var res = CSVLoader.ReadResourceCSV("food");
+
+        foreach (var r in res)
+        {
+            var cat = r["category"];
+            FoodCategory fc = FoodCategory.None;
+            if (cat == "main")
+                fc = FoodCategory.MainCourse;
+            else if (cat == "soup")
+                fc = FoodCategory.Soup;
+            else if (cat == "desert")
+                fc = FoodCategory.Desert;
+            else if (cat == "drink")
+                fc = FoodCategory.Drink;
+
+            var fd = new FoodTemplate() {
+                id = Int32.Parse(r["id"]),
+                alias = r["alias"],
+                name_id = Int32.Parse(r["name_id"]),
+                category = fc,
+                base_amount = TryParseInt32(r["baseamount"], 100),
+                portion_amount = TryParseInt32(r["portionamount"], 100),
+                unit = r["unit"],
+                kilocalories = TryParseInt32(r["kcal"], 0),
+                carbs = TryParseInt32(r["carbohydrates"], 0),
+                sugar = TryParseInt32(r["sugar"]),
+                fat = TryParseInt32(r["fat"]),
+                proteins = TryParseInt32(r["proteins"]),
+                fibre = TryParseInt32(r["fibre"])
+            };
+
+            _Food.Add(fd.id, fd);
+        }
+    }
+
+    private Int32 TryParseInt32(string input, int defaultVal = 0)
+    {
+        int result = 0;
+        if (Int32.TryParse(input, out result))
+            return result;
+
+        return defaultVal;
+    }
+
 
 
 
@@ -311,5 +388,27 @@ public class DataLoader
         if (_Exams.ContainsKey(id))
             return _Exams[id];
         return null;
+    }
+
+    public FoodTemplate GetFood(int id)
+    {
+        if (_Food.ContainsKey(id))
+            return _Food[id];
+        return null;
+    }
+
+    public List<int> GetFoodIds(FoodCategory cat = FoodCategory.All)
+    {
+        if (cat == FoodCategory.All)
+            return _Food.Keys.ToList();
+
+        List<int> ids = new List<int>();
+        foreach (var tp in _Food)
+        {
+            if (tp.Value.category == cat)
+                ids.Add(tp.Key);
+        }
+
+        return ids;
     }
 }

@@ -15,6 +15,8 @@ public class ClassroomDoorScript : MonoBehaviour, InteractiveObject, Interactive
         BlackoutPanel.Blackout(3.0f, () => {
             if (CafeteriaTeleportTarget != null)
             {
+                CafeteriaController.Current.ResetCafeteria(true);
+
                 SC_FPSController.Current.TeleportTo(CafeteriaTeleportTarget.transform.position, CafeteriaTeleportTarget.transform.rotation);
 
                 if (ObjectivesMgr.Current.HasActiveQuest(4))

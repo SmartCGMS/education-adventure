@@ -1,0 +1,5 @@
+id;alias;name_id;category;baseamount;portionamount;unit;kcal;carbohydrates;sugar;fat;proteins;fibre
+1;hovezi-zampiony;98;main;100;100;g;99;15;1;2;5;
+2;skubanky-mak;99;main;100;200;g;153;24;10;5;5;3
+3;rizoto;100;main;100;250;g;125;16;2;4;5;1
+4;karbanatek;101;main;100;150;g;240;22;2;13;9;

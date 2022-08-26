@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor.Build.Content;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -174,7 +175,7 @@ public class SC_FPSController : MonoBehaviour
         if (rayHit)
         {
             var namedobj = hit.transform.GetComponent<NamedObjectScript>();
-            if (namedobj != null && namedobj.ObjectDescription.Length > 0)
+            if (namedobj != null && namedobj.enabled && namedobj.ObjectDescription.Length > 0)
             {
                 RayCastText.text = namedobj.ObjectDescription;
                 if (namedobj.ObjectInteractDescription.Length > 0)
@@ -219,7 +220,7 @@ public class SC_FPSController : MonoBehaviour
                     bool prevent = false;
                     foreach (var cond in interactiveCond)
                     {
-                        if (cond.PreventInteract())
+                        if ((cond as MonoBehaviour).enabled && cond.PreventInteract())
                         {
                             prevent = true;
                             break;
@@ -229,12 +230,16 @@ public class SC_FPSController : MonoBehaviour
                     if (!prevent)
                     {
                         var cmp = objectHit.GetComponent<TogglerScript>();
-                        if (cmp != null)
+                        if (cmp != null && cmp.enabled)
                             cmp.ToggleState();
 
                         var interactive = objectHit.GetComponent<InteractiveObject>();
-                        if (interactive != null)
+                        if (interactive != null && (interactive as MonoBehaviour).enabled)
                             interactive.Interact();
+
+                        var named = objectHit.GetComponent<NamedObjectScript>();
+                        if (named != null && named.enabled)
+                            ObjectivesMgr.Current.SignalObjective(Objectives.Use, named.ObjectIdentifier, ObjectiveGroups.All);
                     }
                 }
             }
@@ -384,10 +389,15 @@ public class SC_FPSController : MonoBehaviour
 
     private GameObject HeldObject = null;
 
-    public void CreateHeldObject(GameObject objTemplate, Vector3 offset, Quaternion rotation, Vector3 scale)
+    [HideInInspector]
+    public int HeldObjectId { get; private set; }
+
+    public GameObject CreateHeldObject(int objectId, GameObject objTemplate, Vector3 offset, Quaternion rotation, Vector3 scale)
     {
         if (HeldObject != null)
             ClearHeldObjects();
+
+        HeldObjectId = objectId;
 
         GameObject obj = Instantiate(objTemplate, gameObject.transform) as GameObject;
 
@@ -396,16 +406,35 @@ public class SC_FPSController : MonoBehaviour
         obj.transform.localPosition = offset;
         obj.transform.localRotation = rotation;
         obj.transform.localScale = scale;
+
+        HeldObject = obj;
+
+        return obj;
     }
 
     public void ClearHeldObjects()
     {
+        HeldObjectId = 0;
         Destroy(HeldObject);
+        HeldObject = null;
     }
 
     public bool IsHoldingObject()
     {
         return (HeldObject != null);
+    }
+
+    public GameObject TransferHeldObject(GameObject newParent)
+    {
+        if (!IsHoldingObject())
+            return null;
+
+        GameObject held = HeldObject;
+        held.transform.SetParent(newParent.transform);
+        HeldObject = null;
+        HeldObjectId = 0;
+
+        return held;
     }
 
     //////////
