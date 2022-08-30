@@ -45,6 +45,7 @@ public class SC_FPSController : MonoBehaviour
     public GameObject PumpDisplayPanel;
     public GameObject MainCameraObject;
 
+    [Header("Fake starting")]
     public bool PerformFakeStart = true;
     public int FakeStartQuestId = 4;
     public GameObject FakeStartGameObject = null;
@@ -449,6 +450,7 @@ public class SC_FPSController : MonoBehaviour
     ///// Persistent state part
     //////////
 
+    [HideInInspector]
     public bool ToiletUseFlag = false;
 
     //////////

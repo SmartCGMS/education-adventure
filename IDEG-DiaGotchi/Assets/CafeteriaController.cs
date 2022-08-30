@@ -19,8 +19,10 @@ public class CafeteriaController : MonoBehaviour
     public TrayState trayState { get; private set; } = TrayState.None;
 
     private List<DataLoader.FoodTemplate> TodaysFood_Main = new List<DataLoader.FoodTemplate>();
+    private List<DataLoader.FoodTemplate> TodaysFood_Soup = new List<DataLoader.FoodTemplate>();
 
     public List<GameObject> Plates_Main;
+    public List<GameObject> Bowls_Soup;
 
     public List<GameObject> TrayLines;
 
@@ -40,34 +42,64 @@ public class CafeteriaController : MonoBehaviour
                 cm.enabled = true;
         }
 
+        // Blender export for correct local transformation (and to "match plate transformation"):
+        //  - Apply Transform
+        //  - scale = FBX All
+        //  - X Forward, Y Up
         if (generateMeals)
         {
-            TodaysFood_Main.Clear();
-            var ids = SelectRandomN(DataLoader.Current.GetFoodIds(DataLoader.FoodCategory.MainCourse), 3);
-            foreach (var id in ids)
-                TodaysFood_Main.Add(DataLoader.Current.GetFood(id));
-
-            // Resources/Food/jidlo-****
-            for (int i = 0; i < Plates_Main.Count && i < TodaysFood_Main.Count; i++)
+            // main meal scope
             {
-                var res = Resources.Load<GameObject>("Food/jidlo-" + TodaysFood_Main[i].alias);
-                if (res == null)
-                    continue;
+                TodaysFood_Main.Clear();
+                var ids = SelectRandomN(DataLoader.Current.GetFoodIds(DataLoader.FoodCategory.MainCourse), 3);
+                foreach (var id in ids)
+                    TodaysFood_Main.Add(DataLoader.Current.GetFood(id));
 
-                var obj = Instantiate(res, Plates_Main[i].transform);
-                // Blender export for correct local transformation (and to "match plate transformation"):
-                //  - Apply Transform
-                //  - scale = FBX All
-                //  - X Forward, Y Up
+                // Resources/Food/jidlo-****
+                for (int i = 0; i < Plates_Main.Count && i < TodaysFood_Main.Count; i++)
+                {
+                    var res = Resources.Load<GameObject>("Food/jidlo-" + TodaysFood_Main[i].alias);
+                    if (res == null)
+                        continue;
 
-                var collider = obj.AddComponent<BoxCollider>();
+                    var obj = Instantiate(res, Plates_Main[i].transform);
 
-                var named = obj.AddComponent<NamedObjectScript>();
-                named.ObjectDescription = Strings.Get(TodaysFood_Main[i].name_id);
+                    obj.AddComponent<BoxCollider>();
 
-                var cfs = obj.AddComponent<CafeteriaFoodScript>();
-                cfs.RequiredTrayState = TrayState.OnRailing_1;
-                cfs.CafeteriaFoodIndex = i;
+                    obj.AddComponent<NamedObjectScript>().ObjectDescription = Strings.Get(TodaysFood_Main[i].name_id);
+
+                    var cfs = obj.AddComponent<CafeteriaFoodScript>();
+                    cfs.RequiredTrayState = TrayState.OnRailing_1;
+                    cfs.CafeteriaFoodCategory = DataLoader.FoodCategory.MainCourse;
+                    cfs.CafeteriaFoodIndex = i;
+                }
+            }
+
+            // soup scope
+            {
+                TodaysFood_Soup.Clear();
+                var ids = SelectRandomN(DataLoader.Current.GetFoodIds(DataLoader.FoodCategory.Soup), 2);
+                foreach (var id in ids)
+                    TodaysFood_Soup.Add(DataLoader.Current.GetFood(id));
+
+                // Resources/Food/polevka-****
+                for (int i = 0; i < Bowls_Soup.Count && i < Bowls_Soup.Count; i++)
+                {
+                    var res = Resources.Load<GameObject>("Food/polevka-" + TodaysFood_Soup[i].alias);
+                    if (res == null)
+                        continue;
+
+                    var obj = Instantiate(res, Bowls_Soup[i].transform);
+
+                    obj.AddComponent<BoxCollider>();
+
+                    obj.AddComponent<NamedObjectScript>().ObjectDescription = Strings.Get(TodaysFood_Soup[i].name_id);
+
+                    var cfs = obj.AddComponent<CafeteriaFoodScript>();
+                    cfs.RequiredTrayState = TrayState.OnRailing_2;
+                    cfs.CafeteriaFoodCategory = DataLoader.FoodCategory.Soup;
+                    cfs.CafeteriaFoodIndex = i;
+                }
             }
         }
     }
@@ -97,10 +129,9 @@ public class CafeteriaController : MonoBehaviour
 
         if (TrayObject != null)
         {
-            if (trayState == TrayState.OnRailing_1 || trayState == TrayState.OnRailing_2 || trayState == TrayState.OnRailing_3 || trayState == TrayState.OnRailing_4)
+            if (trayState == TrayState.OnRailing_1)// || trayState == TrayState.OnRailing_2 || trayState == TrayState.OnRailing_3 || trayState == TrayState.OnRailing_4)
             {
-                TrayObject.transform.localPosition = new Vector3(-0.0637f, 0.1432f, 0.1514f);
-                TrayObject.transform.localRotation = Quaternion.Euler(0, 0, 0);
+                TrayObject.GetComponent<Animator>()?.SetInteger("TrayState", 2);
             }
         }
     }
@@ -110,18 +141,27 @@ public class CafeteriaController : MonoBehaviour
         TrayObject = go;
     }
 
-    public void SignalFoodTaken(int index)
+    public void SignalFoodTaken(DataLoader.FoodCategory category, int index)
     {
-        if (trayState == TrayState.OnRailing_1)
+        if (category == DataLoader.FoodCategory.MainCourse && trayState == TrayState.OnRailing_1)
         {
-            if (TrayObject != null)
-                TrayObject.transform.SetParent(TrayLines[1].transform);
+            TrayObject.GetComponent<Animator>()?.SetInteger("TrayState", 3);
             SetTrayState(TrayState.OnRailing_2);
 
             var plate = Instantiate(Plates_Main[index], TrayObject.transform);
-            plate.transform.localPosition = new Vector3(0,0, 0.0009f);
-            plate.transform.localRotation = Quaternion.Euler(0,90,90);
-            plate.transform.localScale = new Vector3(0.005f, 0.005f, 0.005f);
+            plate.transform.localPosition = new Vector3(-1.143f, 0.09f, -0.288f);
+            plate.transform.localRotation = Quaternion.Euler(0, 0, 0);
+            plate.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
+        }
+        else if (category == DataLoader.FoodCategory.Soup && trayState == TrayState.OnRailing_2)
+        {
+            TrayObject.GetComponent<Animator>()?.SetInteger("TrayState", 4);
+            SetTrayState(TrayState.OnRailing_3);
+
+            var plate = Instantiate(Bowls_Soup[index], TrayObject.transform);
+            plate.transform.localPosition = new Vector3(0.333f, 0.0118f, 0.307f);
+            plate.transform.localRotation = Quaternion.Euler(0, 0, 0);
+            plate.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
         }
     }
 

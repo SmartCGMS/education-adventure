@@ -6,7 +6,7 @@ public class TrayScript : MonoBehaviour, InteractiveObject, InteractiveObjectCon
 {
     public void Interact()
     {
-        var obj = SC_FPSController.Current.CreateHeldObject(32, gameObject, new Vector3(0.1f, 0.15f, 0.8f), Quaternion.Euler(-90, 0, 90), new Vector3(25, 25, 25));
+        var obj = SC_FPSController.Current.CreateHeldObject(32, gameObject, new Vector3(0.1f, 0.15f, 0.8f), Quaternion.Euler(0, 0, 0), new Vector3(0.25f, 0.25f, 0.25f));
 
         var comp = obj.GetComponent<TrayScript>();
         if (comp)
@@ -15,6 +15,8 @@ public class TrayScript : MonoBehaviour, InteractiveObject, InteractiveObjectCon
         var comp2 = obj.GetComponent<NamedObjectScript>();
         if (comp2)
             Destroy(comp2);
+
+        obj.GetComponent<Animator>()?.SetInteger("TrayState", 1);
     }
 
     public bool PreventInteract()
