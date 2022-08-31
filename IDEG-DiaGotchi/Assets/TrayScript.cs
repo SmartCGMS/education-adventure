@@ -10,17 +10,23 @@ public class TrayScript : MonoBehaviour, InteractiveObject, InteractiveObjectCon
 
         var comp = obj.GetComponent<TrayScript>();
         if (comp)
-            Destroy(comp);
+            comp.enabled = false;
 
         var comp2 = obj.GetComponent<NamedObjectScript>();
         if (comp2)
-            Destroy(comp2);
+            comp2.enabled = false;
 
-        obj.GetComponent<Animator>()?.SetInteger("TrayState", 1);
+        if (CafeteriaController.Current.trayState == CafeteriaController.TrayState.Finished)
+            obj.GetComponent<Animator>()?.SetInteger("TrayState", 6); // holding "full"
+        else
+            obj.GetComponent<Animator>()?.SetInteger("TrayState", 1); // holding "empty"
+
+        if (CafeteriaController.Current.trayState == CafeteriaController.TrayState.Finished)
+            Destroy(gameObject);
     }
 
     public bool PreventInteract()
     {
-        return (SC_FPSController.Current.IsHoldingObject() || CafeteriaController.Current.trayState != CafeteriaController.TrayState.None);
+        return (SC_FPSController.Current.IsHoldingObject() || (CafeteriaController.Current.trayState != CafeteriaController.TrayState.None && CafeteriaController.Current.trayState != CafeteriaController.TrayState.Finished));
     }
 }

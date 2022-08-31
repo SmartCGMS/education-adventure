@@ -114,7 +114,7 @@ public class DataLoader
 
         MainCourse,
         Soup,
-        Desert,
+        Side,
         Drink,
 
         All
@@ -318,8 +318,8 @@ public class DataLoader
                 fc = FoodCategory.MainCourse;
             else if (cat == "soup")
                 fc = FoodCategory.Soup;
-            else if (cat == "desert")
-                fc = FoodCategory.Desert;
+            else if (cat == "side")
+                fc = FoodCategory.Side;
             else if (cat == "drink")
                 fc = FoodCategory.Drink;
 

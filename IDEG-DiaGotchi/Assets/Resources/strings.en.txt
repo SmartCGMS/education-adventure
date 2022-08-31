@@ -104,3 +104,10 @@
 103;Chicken soup with noodles
 104;Pea soup
 105;Potato soup with mushrooms
+106;Water (still)
+107;Cola
+108;Orange juice
+109;Elderberry lemonade
+110;Cucumber salad
+111;Tangerine
+112;Take

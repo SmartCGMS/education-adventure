@@ -174,7 +174,7 @@ public class SC_FPSController : MonoBehaviour
         RaycastHit[] hits;
         hits = Physics.RaycastAll(ray, rayLength, layerMask);
 
-        int realHitIndex = 0; // if something gets hit, but nothing is registered, we "hit" the first object for interaction
+        int realHitIndex = -1;
         bool nameAssigned = false;
 
         if (hits.Length > 0)
@@ -219,7 +219,7 @@ public class SC_FPSController : MonoBehaviour
             {
                 InteractPressed = true;
 
-                if (hits.Length > 0)
+                if (hits.Length > 0 && realHitIndex >= 0)
                 {
                     RaycastHit hit = hits[realHitIndex];
 
