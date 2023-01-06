@@ -4,7 +4,7 @@ using UnityEngine;
 
 public interface AreaTrigger
 {
-    public abstract void Triggered();
+    public abstract void Triggered(int triggerId = 0);
 }
 
 public class AreaTriggerScript : MonoBehaviour
@@ -25,7 +25,7 @@ public class AreaTriggerScript : MonoBehaviour
 
         var trig = GetComponent<AreaTrigger>();
         if (trig != null)
-            trig.Triggered();
+            trig.Triggered(AreaTriggerIdentifier);
 
         if (AreaTriggerIdentifier > 0)
         {

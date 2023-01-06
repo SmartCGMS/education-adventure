@@ -282,6 +282,7 @@ public class SC_FPSController : MonoBehaviour
                 }
 
                 IsControllerOpened = !IsControllerOpened;
+                PerformScriptedAction(10013);
             }
         }
         else if (ControllerDisplayPressed)
@@ -311,6 +312,7 @@ public class SC_FPSController : MonoBehaviour
                 }
 
                 IsPumpOpened = !IsPumpOpened;
+                PerformScriptedAction(10015);
             }
         }
         else if (PumpDisplayPressed)
@@ -523,6 +525,21 @@ public class SC_FPSController : MonoBehaviour
                 ObjectivesMgr.Current.SignalObjective(Objectives.Misc, -2);
                 Unfreeze();
                 Freeze(true);
+                break;
+            case 3: // lunch picked - signal quest objective
+                ObjectivesMgr.Current.SignalObjective(Objectives.Misc, -3);
+                break;
+            case 4: // PE class, laps finished - signal quest objective
+                ObjectivesMgr.Current.SignalObjective(Objectives.Misc, -4);
+                break;
+            case 5: // listen to doctor
+                ObjectivesMgr.Current.SignalObjective(Objectives.Misc, -5);
+                break;
+            case 6: // sensor learn
+                ObjectivesMgr.Current.SignalObjective(Objectives.Misc, -6);
+                break;
+            case 7: // pump learn
+                ObjectivesMgr.Current.SignalObjective(Objectives.Misc, -7);
                 break;
         }
     }

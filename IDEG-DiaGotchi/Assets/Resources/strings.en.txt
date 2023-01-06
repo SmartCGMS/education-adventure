@@ -111,3 +111,52 @@
 110;Cucumber salad
 111;Tangerine
 112;Take
+113;PE class
+114;Go to the playground
+115;Finish the run
+116;I feel pretty tired I might faint... And that's not the first time.
+117;My mom said we will se a doctor this afternoon, maybe he will help me with that.
+118;Better go see the doctor, my mom is already waiting for me!
+119;Diabetologist clinic
+120;Listen to the doctor
+121;Learn to use the sensor
+122;Learn to use the pump
+123;Go home
+124;I still need to eat my lunch before leaving!
+125;Today, we will be running!
+126;Run around the playground as fast as you can!
+127;Do 3 full circles and then report back to me.
+128;Run trigger 1
+129;Run trigger 2
+130;Run trigger 3
+131;Run trigger 4
+132;Doctor: Hello! How are you today?
+133;Doctor: I understand that you have some trouble. Do you often feel exhausted?
+134;Doctor: Do you often go to the toilet? Some headaches?
+135;Me: Yes, all of it. Am I sick? What is it?
+136;Doctor: Let me check something quickly. I will draw a drop of your blood to perform a quick test.
+137;Doctor: Don't worry, it's just a little prick, you will feel almost nothing. Ready?
+138;Doctor: There we go... Ah, yes, as I suspected. Your blood glucose level is 17 mmol/L, that's way too high.
+139;Doctor: I am afraid you have diabetes. But don't worry, current technology will help you manage it.
+140;Doctor: You just have to be careful about your actions from now on, and you will be just fine!
+141;Doctor: I will give you a sensor to your arm. It is a small device, you will barely notice it.
+142;Doctor: I will also give you a pump. We will go through it together, okay? Ready?
+143;Me: Yeah, I guess...
+144;Doctor: There we go! All set. Let's try it.
+145;Doctor: Your sensor will tell you your blood glucose levels. Use your mobile phone to check it.
+146;Doctor: Now press R to see your glucose!
+147;Doctor: Great! Whenever your glucose drops below 3.5, stop what you're doing and eat something sweet. But not too much!
+148;Doctor: And... whenever your glucose goes over 10.0, you should use insulin pump to dose some insulin. This will lower your glucose. But also - not too much!
+149;Doctor: Now let's see your pump. Press T to see your pump display!
+150;Doctor: Perfect! Dose bolus insulin when the glucose is too high to take immediate action
+151;Doctor: Dose basal insulin as a continuous suply - not too high, but just fine to keep your steady levels within the range.
+152;Doctor: Now you're all set.
+153;Me: But what if I can't do it? What if I do something wrong?
+154;Doctor: Don't worry, your parents will tell you what to do. For now, just try to be careful and do not dose too much insulin. Start at smaller doses.
+155;Doctor: And if there is any problem, just call me or visit me here. Okay?
+156;Me: Thank you, doctor! Good bye!
+157;Doctor: Good bye!
+158;Home again
+159;Go home
+160;I cannot leave, we have PE class!
+161;I should listen to the doctor first.

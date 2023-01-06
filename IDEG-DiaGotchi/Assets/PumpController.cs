@@ -6,8 +6,10 @@ using UnityEngine.UI;
 public class PumpController : MonoBehaviour
 {
     private float CurrentSelectedBolus = 0;
+    private float CurrentSelectedBasal = 0;
 
     public Text CurrentBolusText;
+    public Text CurrentBasalText;
 
     void Start()
     {
@@ -27,6 +29,8 @@ public class PumpController : MonoBehaviour
     public void BolusAddVal()
     {
         CurrentSelectedBolus += 0.2f;
+        if (CurrentSelectedBolus > 5)
+            CurrentSelectedBolus = 5;
         UpdateBolusText();
     }
 
@@ -42,5 +46,31 @@ public class PumpController : MonoBehaviour
 
         CurrentSelectedBolus = 0.0f;
         UpdateBolusText();
+    }
+
+
+    private void UpdateBasalText()
+    {
+        CurrentBasalText.text = string.Format("{0:0.0} U/hr", CurrentSelectedBasal);
+    }
+
+    public void BasalAddVal()
+    {
+        CurrentSelectedBasal += 0.2f;
+        if (CurrentSelectedBasal > 3)
+            CurrentSelectedBasal = 3;
+        UpdateBasalText();
+    }
+
+    public void BasalSubVal()
+    {
+        CurrentSelectedBasal = Mathf.Max(0.0f, CurrentSelectedBasal - 0.2f);
+        UpdateBasalText();
+    }
+
+    public void BasalDose()
+    {
+        PlayerStatsScript.Current.DoseBasal(CurrentSelectedBasal);
+        UpdateBasalText();
     }
 }

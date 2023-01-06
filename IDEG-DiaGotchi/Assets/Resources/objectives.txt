@@ -7,5 +7,11 @@ id;quest_id;type;name_id;object_id;group
 6;3;misc;19;-1;school
 7;3;misc;20;-2;school
 8;4;use;91;31;school
-9;4;misc;90;-2;school
-10;4;misc;92;-3;school
+9;4;misc;90;-3;school
+10;4;use;92;33;school
+11;5;use;114;34;school
+12;5;misc;115;-4;school
+13;6;misc;120;-5;doctor
+14;6;misc;121;-6;doctor
+15;6;misc;122;-7;doctor
+16;7;use;159;36;doctor

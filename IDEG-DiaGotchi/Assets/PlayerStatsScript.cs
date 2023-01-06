@@ -335,4 +335,9 @@ public class PlayerStatsScript : MonoBehaviour
     {
         game.ScheduleInsulinBolus((double)val, 0.0f);
     }
+
+    public void DoseBasal(float val)
+    {
+        game.ScheduleInsulinBasalRate((double)val, 0.0f);
+    }
 }

@@ -17,7 +17,10 @@ public class TrayScript : MonoBehaviour, InteractiveObject, InteractiveObjectCon
             comp2.enabled = false;
 
         if (CafeteriaController.Current.trayState == CafeteriaController.TrayState.Finished)
+        {
+            SC_FPSController.Current.PerformScriptedAction(3);
             obj.GetComponent<Animator>()?.SetInteger("TrayState", 6); // holding "full"
+        }
         else
             obj.GetComponent<Animator>()?.SetInteger("TrayState", 1); // holding "empty"
 

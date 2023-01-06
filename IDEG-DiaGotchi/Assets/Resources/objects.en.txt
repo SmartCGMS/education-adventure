@@ -31,3 +31,8 @@
 30;Tray
 31;Classroom door
 32;Tray line
+33;Cafeteria desk
+34;Cafeteria door
+35;Playground door
+36;Office door
+37;Dr. Jones

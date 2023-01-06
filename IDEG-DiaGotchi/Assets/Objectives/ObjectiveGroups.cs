@@ -11,5 +11,6 @@ public enum ObjectiveGroups
 
     Home,
     School,
+    Doctor,
     // ...
 }

@@ -8,7 +8,7 @@ public class OutsideDoorTrigger : MonoBehaviour, AreaTrigger
 
     public GameObject TeleportTarget = null;
 
-    public void Triggered()
+    public void Triggered(int triggerId)
     {
         if (ObjectivesMgr.Current.HasActiveQuest(2))
         {

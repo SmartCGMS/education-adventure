@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class BathroomDoorTrigger : MonoBehaviour, AreaTrigger
 {
-    public void Triggered()
+    public void Triggered(int triggerId)
     {
         if (SC_FPSController.Current.ToiletUseFlag)
         {
