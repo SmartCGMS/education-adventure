@@ -15,3 +15,6 @@ id;quest_id;type;name_id;object_id;group
 14;6;misc;121;-6;doctor
 15;6;misc;122;-7;doctor
 16;7;use;159;36;doctor
+17;7;misc;162;-8;home
+18;7;misc;163;-9;home
+19;7;misc;164;-10;home

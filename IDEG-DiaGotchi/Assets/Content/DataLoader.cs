@@ -200,6 +200,8 @@ public class DataLoader
                 ogrp = ObjectiveGroups.Home;
             else if (grpName == "school")
                 ogrp = ObjectiveGroups.School;
+            else if (grpName == "doctor")
+                ogrp = ObjectiveGroups.Doctor;
 
             if (!_Quests.ContainsKey(qid))
                 continue;

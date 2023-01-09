@@ -202,4 +202,17 @@ public class ObjectivesMgr : MonoBehaviour
                 break;
         }
     }
+
+    public bool HasObjectiveType(Objectives type, int objectIdentifier = -1, ObjectiveStates requiredState = ObjectiveStates.Any)
+    {
+        foreach (var sobj in CurrentObjectives)
+        {
+            bool stateOk = (requiredState == ObjectiveStates.Any || (requiredState == ObjectiveStates.Incomplete && !sobj.completed) || (requiredState == ObjectiveStates.Complete && sobj.completed));
+
+            if (sobj.type == type && (sobj.objectIdentifier == objectIdentifier || objectIdentifier == -1) && stateOk)
+                return true;
+        }
+
+        return false;
+    }
 }

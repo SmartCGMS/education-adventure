@@ -160,3 +160,9 @@
 159;Go home
 160;I cannot leave, we have PE class!
 161;I should listen to the doctor first.
+162;Have dinner
+163;Maintain good glycaemia
+164;Have some fun
+165;I don't need that right now.
+166;I don't have time for that right now.
+167;Now is not the right time for sitting here. I should sit here during lunch, when I have a full tray of food.

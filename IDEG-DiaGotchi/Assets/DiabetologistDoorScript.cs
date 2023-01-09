@@ -17,6 +17,7 @@ public class DiabetologistDoorScript : MonoBehaviour, InteractiveObject, Interac
             {
                 CafeteriaController.Current.ResetCafeteria(true);
 
+                SC_FPSController.Current.ResetCollectibles(ObjectiveGroups.Home);
                 SC_FPSController.Current.TeleportTo(HomeTeleportTarget.transform.position, HomeTeleportTarget.transform.rotation);
 
                 PlayerStatsScript.Current.SetTime(19, 15);

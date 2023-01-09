@@ -541,6 +541,67 @@ public class SC_FPSController : MonoBehaviour
             case 7: // pump learn
                 ObjectivesMgr.Current.SignalObjective(Objectives.Misc, -7);
                 break;
+            case 8: // eating script
+                if (PlayerStatsScript.Current.HungerValue < 0.1)
+                {
+                    ObjectivesMgr.Current.SignalObjective(Objectives.Misc, -8);
+                }
+                break;
+            case 9: // maintain glycaemia script
+                ObjectivesMgr.Current.SignalObjective(Objectives.Misc, -9);
+                break;
         }
+    }
+
+    private class RegisteredCollectibleToReset
+    {
+        public int ObjectIdentifier;
+        public Transform transform;
+        public ObjectiveGroups objectiveGroup;
+    }
+
+    private List<RegisteredCollectibleToReset> registeredCollectiblesToReset = new List<RegisteredCollectibleToReset>();
+
+    public void RegisterCollectibleToReset(int objectIdentifier, Transform transform, ObjectiveGroups objGroup = ObjectiveGroups.All)
+    {
+        registeredCollectiblesToReset.Add(new RegisteredCollectibleToReset { ObjectIdentifier = objectIdentifier, transform = transform, objectiveGroup = objGroup });
+    }
+
+    public void ResetCollectibles(ObjectiveGroups objGroup)
+    {
+        List<RegisteredCollectibleToReset> toRemove = new List<RegisteredCollectibleToReset>();
+
+        foreach (var col in registeredCollectiblesToReset)
+        {
+            if (col.objectiveGroup == objGroup || objGroup == ObjectiveGroups.All)
+            {
+                toRemove.Add(col);
+
+                col.transform.GetComponent<Renderer>().enabled = true;
+                col.transform.GetComponent<Collider>().enabled = true;
+            }
+        }
+
+        foreach (var col in toRemove)
+            registeredCollectiblesToReset.Remove(col);
+    }
+
+    public void ResetCollectibles(int objectIdentifier)
+    {
+        List<RegisteredCollectibleToReset> toRemove = new List<RegisteredCollectibleToReset>();
+
+        foreach (var col in registeredCollectiblesToReset)
+        {
+            if (col.ObjectIdentifier == objectIdentifier)
+            {
+                toRemove.Add(col);
+
+                col.transform.GetComponent<Renderer>().enabled = true;
+                col.transform.GetComponent<Collider>().enabled = true;
+            }
+        }
+
+        foreach (var col in toRemove)
+            registeredCollectiblesToReset.Remove(col);
     }
 }

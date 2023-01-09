@@ -56,7 +56,8 @@ public class PlayerStatsScript : MonoBehaviour
 
     public static PlayerStatsScript Current;
 
-    private static readonly int IGHistoryCnt = 4;
+    private static readonly int IGHistoryCnt = 12; // 5 min spacing => 12 per hour
+    private static readonly int IGHistoryTrendCnt = 4;
     private List<double> IGHistory = new List<double>();
 
     public Texture2D TrendLow3;
@@ -128,11 +129,11 @@ public class PlayerStatsScript : MonoBehaviour
 
         // -3, -2, -1, 0, 1, 2, 3
         int igtrend = 0; // flat
-        if (IGHistory.Count == IGHistoryCnt)
+        if (IGHistory.Count > IGHistoryTrendCnt)
         {
             double kTotal = 0;
 
-            for (int i = 0; i < IGHistoryCnt - 1; i++)
+            for (int i = IGHistory.Count - IGHistoryTrendCnt - 1; i < IGHistory.Count - 1; i++)
                 kTotal += IGHistory[i + 1] - IGHistory[i];
 
             if (kTotal > 2.5)
@@ -169,6 +170,23 @@ public class PlayerStatsScript : MonoBehaviour
         IGHistory.Add(game.InterstitialGlucose);
         while (IGHistory.Count > IGHistoryCnt)
             IGHistory.RemoveAt(0);
+
+        // check if player maintained IG between 3.5 and 10 mmol/L for at least an hour
+        if (IGHistory.Count == IGHistoryCnt)
+        {
+            bool allOk = true;
+            foreach (var ig in IGHistory)
+            {
+                if (ig < 3.5 || ig > 10.0)
+                {
+                    allOk = false;
+                    break;
+                }
+            }
+
+            if (allOk)
+                SC_FPSController.Current.PerformScriptedAction(9);
+        }
 
         var beforeMinutes = MinuteOfDay;
 

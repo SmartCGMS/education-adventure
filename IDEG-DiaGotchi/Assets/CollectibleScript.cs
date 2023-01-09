@@ -9,6 +9,9 @@ public class CollectibleScript : NamedObjectScript, InteractiveObject
 
     private bool Collected = false;
 
+    public bool MustHaveAssociatedQuest = false;
+    public ObjectiveGroups ObjectiveGroup = ObjectiveGroups.None;
+
     public override void Start()
     {
         base.Start();
@@ -21,10 +24,21 @@ public class CollectibleScript : NamedObjectScript, InteractiveObject
         if (OneShot && Collected)
             return;
 
+        if (MustHaveAssociatedQuest && !ObjectivesMgr.Current.HasObjectiveType(Objectives.Collect, ObjectIdentifier))
+        {
+            SC_FPSController.Current.Talk(Strings.Get(165));
+            return;
+        }
+
         ObjectivesMgr.Current.SignalObjective(Objectives.Collect, ObjectIdentifier, ObjectiveGroups.All);
+        SC_FPSController.Current.RegisterCollectibleToReset(ObjectIdentifier, transform, ObjectiveGroup);
 
         if (RemoveAfterCollecting)
-            Destroy(transform.parent.gameObject);
+        {
+            transform.GetComponent<Renderer>().enabled = false;
+            transform.GetComponent<Collider>().enabled = false;
+            //Destroy(transform.parent.gameObject);
+        }
 
         if (OneShot)
         {

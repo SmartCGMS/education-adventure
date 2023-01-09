@@ -4,30 +4,32 @@ using UnityEngine;
 
 public class CafeteriaDeskScript : MonoBehaviour, InteractiveObject, InteractiveObjectCondition
 {
+    public BlackoutScript BlackoutPanel = null;
+
     public void Interact()
     {
         if (CafeteriaController.Current.trayState == CafeteriaController.TrayState.Finished)
         {
-            SC_FPSController.Current.ClearHeldObjects();
+            BlackoutPanel.Blackout(3.0f, () => {
+                SC_FPSController.Current.Freeze();
 
-            CafeteriaController.Current.SetTrayState(CafeteriaController.TrayState.None);
+                SC_FPSController.Current.ClearHeldObjects();
+
+                CafeteriaController.Current.SetTrayState(CafeteriaController.TrayState.None);
+            }, () => {
+                SC_FPSController.Current.Unfreeze();
+            });
         }
     }
 
     public bool PreventInteract()
     {
-        return (CafeteriaController.Current.trayState != CafeteriaController.TrayState.Finished);
-    }
+        if (CafeteriaController.Current.trayState != CafeteriaController.TrayState.Finished)
+        {
+            SC_FPSController.Current.Talk(Strings.Get(167));
+            return true;
+        }
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
+        return false;
     }
 }

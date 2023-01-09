@@ -12,6 +12,8 @@ public class FoodRecordScript : MonoBehaviour
     public void EatButtonClicked()
     {
         PlayerStatsScript.Current.EatMeal(new PlayerStatsScript.MealParam { carbs = CarbContent, hungerDec = HungerValue });
+        // signalize eating scripts
+        SC_FPSController.Current.PerformScriptedAction(8);
 
         FoodUI.CloseFoodUI();
     }
